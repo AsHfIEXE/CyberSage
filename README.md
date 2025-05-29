@@ -214,5 +214,5 @@ CyberSage V2 is a powerful tool intended for **educational purposes and authoriz
 ---
 
 <p align="center">
-  Made with ❤️ by [Your Name/Team Name]
+  Made with ❤️ by Salehin Ashfi
 </p>
