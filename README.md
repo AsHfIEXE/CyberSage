@@ -2,7 +2,7 @@
   <img src="placeholder_logo.png" alt="CyberSage V2 Logo" width="150"/>
 </p>
 
-<h1 align="center">CyberSage V2</h1>
+<h1 align="center">CyberSage</h1>
 
 <p align="center">
   <strong>An Automated & Intelligent Web Security Assessment Suite</strong>
@@ -19,21 +19,21 @@
 
 <p align="center">
   <!-- Optional Badges: Replace with your actual links if you set them up -->
-  <!-- <img src="https://img.shields.io/github/stars/yourusername/CyberSageV2?style=social" alt="GitHub Stars"> -->
-  <!-- <img src="https://img.shields.io/github/forks/yourusername/CyberSageV2?style=social" alt="GitHub Forks"> -->
-  <!-- <img src="https://img.shields.io/github/issues/yourusername/CyberSageV2" alt="GitHub Issues"> -->
-  <!-- <img src="https://img.shields.io/github/license/yourusername/CyberSageV2" alt="License"> -->
+  <!-- <img src="https://img.shields.io/github/stars/AsHfIEXE/CyberSage?style=social" alt="GitHub Stars"> -->
+  <!-- <img src="https://img.shields.io/github/forks/AsHfIEXE/CyberSage?style=social" alt="GitHub Forks"> -->
+  <!-- <img src="https://img.shields.io/github/issues/AsHfIEXE/CyberSage" alt="GitHub Issues"> -->
+  <!-- <img src="https://img.shields.io/github/license/AsHfIEXE/CyberSage" alt="License"> -->
 </p>
 
 ---
 
-**CyberSage V2** is a powerful, Flask-based web application meticulously engineered to automate and streamline the complex workflow of web security assessments and penetration testing. By orchestrating a suite of battle-tested open-source security tools, CyberSage V2 empowers security professionals, developers, and enthusiasts to efficiently uncover vulnerabilities, understand attack surfaces, and bolster web application defenses.
+**CyberSage ** is a powerful, Flask-based web application meticulously engineered to automate and streamline the complex workflow of web security assessments and penetration testing. By orchestrating a suite of battle-tested open-source security tools, CyberSage V2 empowers security professionals, developers, and enthusiasts to efficiently uncover vulnerabilities, understand attack surfaces, and bolster web application defenses.
 
 The platform offers a modern, intuitive web interface for initiating comprehensive scans, tracking their progress in real-time, and analyzing consolidated findings presented in an accessible and actionable format.
 
 ## ✨ Features
 
-CyberSage V2 is packed with features designed to make web security assessments more effective and efficient:
+CyberSage is packed with features designed to make web security assessments more effective and efficient:
 
 *   🌐 **Intuitive Web UI:** A sleek and responsive user interface built with Tailwind CSS and Flowbite, providing a seamless experience for scan management and results visualization.
 *   🛠️ **Modular & Extensible Tool Integration:** A flexible architecture allowing for easy addition and management of various security tools.
@@ -49,11 +49,11 @@ CyberSage V2 is packed with features designed to make web security assessments m
 *   📄 **Structured Logging:** Detailed application and tool execution logs for effective debugging and audit trails.
 
 *(placeholder for a screenshot of the dashboard or results page)*
-`[Screenshot of CyberSageV2 UI]`
+`[Screenshot of CyberSage UI]`
 
 ## 🏗️ Architecture Overview
 
-CyberSage V2 follows a modular, multi-component architecture:
+CyberSage follows a modular, multi-component architecture:
 
 1.  **Flask Backend (`app.py`):**
     *   Serves the web interface and API endpoints.
@@ -75,7 +75,7 @@ CyberSage V2 follows a modular, multi-component architecture:
 
 ## 🧰 Core Toolset
 
-CyberSage V2 integrates the following open-source tools (ensure they are installed and correctly configured in `config/tools.yaml`):
+CyberSage  integrates the following open-source tools (ensure they are installed and correctly configured in `config/tools.yaml`):
 
 *   **Reconnaissance:**
     *   `Subfinder`: Subdomain discovery.
@@ -96,7 +96,7 @@ CyberSage V2 integrates the following open-source tools (ensure they are install
 
 ## 🚀 Getting Started
 
-Follow these steps to get CyberSage V2 up and running on your system (Debian/Ubuntu based Linux recommended):
+Follow these steps to get CyberSage  up and running on your system (Debian/Ubuntu based Linux recommended):
 
 ### Prerequisites
 
@@ -110,8 +110,8 @@ Follow these steps to get CyberSage V2 up and running on your system (Debian/Ubu
 
 1.  **Clone the Repository:**
     ```bash
-    git clone https://github.com/yourusername/CyberSageV2.git # Replace with your repo URL
-    cd CyberSageV2
+    git clone https://github.com/AsHfIEXE/CyberSage # Replace with your repo URL
+    cd CyberSage
     ```
 
 2.  **Run the Installation Script:**
@@ -138,7 +138,7 @@ Follow these steps to get CyberSage V2 up and running on your system (Debian/Ubu
     # pip install "httpx[cli,http2]" --upgrade # Typically handled by requirements if specified
     ```
 
-### Running CyberSage V2
+### Running CyberSage 
 
 1.  **Activate Virtual Environment:**
     ```bash
@@ -169,7 +169,7 @@ Follow these steps to get CyberSage V2 up and running on your system (Debian/Ubu
         *   Modal pop-ups for viewing full details of individual vulnerabilities.
 
 *(placeholder for a GIF showing the scan process and results view)*
-`[GIF of CyberSageV2 in action]`
+`[GIF of CyberSage in action]`
 
 ## 🔧 Troubleshooting
 
@@ -194,7 +194,7 @@ Follow these steps to get CyberSage V2 up and running on your system (Debian/Ubu
 
 ## 🤝 Contributing
 
-Contributions, issues, and feature requests are welcome! Feel free to check [issues page](https://github.com/yourusername/CyberSageV2/issues).
+Contributions, issues, and feature requests are welcome! Feel free to check [issues page](https://github.com/AsHfIEXE/CyberSage/issues).
 
 1.  Fork the Project
 2.  Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
@@ -209,7 +209,7 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 
 ## ⚠️ Disclaimer
 
-CyberSage V2 is a powerful tool intended for **educational purposes and authorized security testing only**. Misuse of this software for unauthorized activities against systems you do not own or have explicit permission to test is illegal and unethical. The authors and contributors are not responsible for any misuse or damage caused by this tool. **Use responsibly and ethically.**
+CyberSage  is a powerful tool intended for **educational purposes and authorized security testing only**. Misuse of this software for unauthorized activities against systems you do not own or have explicit permission to test is illegal and unethical. The authors and contributors are not responsible for any misuse or damage caused by this tool. **Use responsibly and ethically.**
 
 ---
 
