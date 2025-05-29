@@ -1,0 +1,6 @@
+Flask
+matplotlib
+PyYAML
+requests
+httpx[cli,http2]
+openai

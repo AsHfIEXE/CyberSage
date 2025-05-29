@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberSage - Web Assessment</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar { width: 8px; height: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #1f2937; border-radius: 10px;}
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 10px;}
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #6b7280; }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen flex flex-col items-center justify-center pt-8 pb-8">
+    <header class="w-full max-w-4xl mx-auto p-6">
+        <h1 class="text-4xl font-bold text-indigo-400 text-center">CyberSage</h1>
+        <p class="text-lg text-gray-400 text-center mt-2">Automated Web Security Assessment & Penetration Testing</p>
+         <nav class="text-center mt-4">
+            <a href="{{ url_for('index') }}" class="text-indigo-300 hover:text-indigo-500 px-3">New Scan</a>
+            <a href="{{ url_for('config_viewer') }}" class="text-indigo-300 hover:text-indigo-500 px-3">View Config</a>
+        </nav>
+    </header>
+    <main class="w-full max-w-xl mx-auto p-6">
+        <form id="scan-form" class="bg-gray-800 p-8 rounded-lg shadow-xl">
+            <div class="mb-6"> 
+                <label for="target" class="block text-sm font-medium text-gray-300 mb-1">Target URL or Domain</label>
+                <input type="text" id="target" name="target" value="testphp.vulnweb.com" class="mt-1 block w-full p-3 bg-gray-700 border border-gray-600 rounded-md text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 placeholder-gray-500" placeholder="e.g., example.com or http://example.com">
+            </div>
+            <button type="submit" id="submitScanButton" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-4 rounded-md transition duration-150 ease-in-out flex items-center justify-center">
+                <span id="scanButtonText">Start Scan</span>
+                <svg id="scanButtonSpinner" class="animate-spin h-5 w-5 text-white hidden ml-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+            </button>
+        </form>
+        
+        <div id="progress-section" class="mt-8 w-full bg-gray-800 p-6 rounded-lg shadow-xl hidden">
+            <div id="scan-id-display" class="mb-2 text-center text-xs text-indigo-400 font-mono"></div>
+            <h2 class="text-xl font-semibold text-gray-300 mb-3 text-center">Scan Progress</h2>
+            <div class="w-full bg-gray-700 rounded-full h-2.5 mb-1">
+                 <div id="progress-bar" class="bg-indigo-500 h-2.5 rounded-full transition-all duration-300 ease-out" style="width: 0%"></div>
+            </div>
+            <p id="progress-bar-text" class="text-xs text-gray-400 text-center mb-3">0%</p>
+            <div id="status-text-container" class="max-h-60 overflow-y-auto bg-gray-700 p-3 rounded-md custom-scrollbar">
+                <ul id="status-text" class="text-xs text-gray-300 space-y-1"></ul>
+            </div>
+        </div>
+         <div id="error-message" class="mt-4 p-3 bg-red-600 text-red-100 rounded-md hidden"></div>
+    </main>
+     <footer class="w-full max-w-4xl mx-auto p-6 text-center text-gray-500 text-sm">
+        <p>© <span id="currentYear"></span> CyberSage - For educational and authorized testing only.</p>
+    </footer>
+    <script src="{{ url_for('static', filename='script.js') }}"></script> 
+    <script>document.getElementById('currentYear').textContent = new Date().getFullYear();</script>
+</body>
+</html>

@@ -1,0 +1,60 @@
+# Dirsearch started Thu May 29 09:34:32 2025 as: /usr/local/bin/dirsearch -u testphp.vulnweb.com
+
+301   169B   http://testphp.vulnweb.com/.idea    -> REDIRECTS TO: http://testphp.vulnweb.com/.idea/
+200     6B   http://testphp.vulnweb.com/.idea/.name
+200   951B   http://testphp.vulnweb.com/.idea/
+200   171B   http://testphp.vulnweb.com/.idea/encodings.xml
+200   266B   http://testphp.vulnweb.com/.idea/misc.xml
+200   275B   http://testphp.vulnweb.com/.idea/modules.xml
+200   143B   http://testphp.vulnweb.com/.idea/scopes/scope_settings.xml
+200   173B   http://testphp.vulnweb.com/.idea/vcs.xml
+200    12KB  http://testphp.vulnweb.com/.idea/workspace.xml
+200     5KB  http://testphp.vulnweb.com/404.php
+200   400B   http://testphp.vulnweb.com/_mmServerScripts/
+200    93B   http://testphp.vulnweb.com/_mmServerScripts/MMHTTPDB.php
+301   169B   http://testphp.vulnweb.com/admin    -> REDIRECTS TO: http://testphp.vulnweb.com/admin/
+200   262B   http://testphp.vulnweb.com/admin/
+200     5KB  http://testphp.vulnweb.com/cart.php
+403   276B   http://testphp.vulnweb.com/cgi-bin
+403   276B   http://testphp.vulnweb.com/cgi-bin/
+404   273B   http://testphp.vulnweb.com/cgi-bin/a1stats/a1disp.cgi
+404   273B   http://testphp.vulnweb.com/cgi-bin/awstats/
+404   273B   http://testphp.vulnweb.com/cgi-bin/htimage.exe?2,2
+404   273B   http://testphp.vulnweb.com/cgi-bin/awstats.pl
+404   273B   http://testphp.vulnweb.com/cgi-bin/htmlscript
+404   273B   http://testphp.vulnweb.com/cgi-bin/imagemap.exe?2,2
+404   273B   http://testphp.vulnweb.com/cgi-bin/index.html
+404   273B   http://testphp.vulnweb.com/cgi-bin/login
+404   273B   http://testphp.vulnweb.com/cgi-bin/login.cgi
+404   273B   http://testphp.vulnweb.com/cgi-bin/mt-xmlrpc.cgi
+404   273B   http://testphp.vulnweb.com/cgi-bin/mt.cgi
+404   273B   http://testphp.vulnweb.com/cgi-bin/mt/mt-xmlrpc.cgi
+404   273B   http://testphp.vulnweb.com/cgi-bin/mt/mt.cgi
+404   273B   http://testphp.vulnweb.com/cgi-bin/mt7/mt-xmlrpc.cgi
+404   273B   http://testphp.vulnweb.com/cgi-bin/php.ini
+404   273B   http://testphp.vulnweb.com/cgi-bin/mt7/mt.cgi
+404   273B   http://testphp.vulnweb.com/cgi-bin/printenv.pl
+404   273B   http://testphp.vulnweb.com/cgi-bin/printenv
+404   273B   http://testphp.vulnweb.com/cgi-bin/test-cgi
+404   273B   http://testphp.vulnweb.com/cgi-bin/ViewLog.asp
+404   273B   http://testphp.vulnweb.com/cgi-bin2/
+404   273B   http://testphp.vulnweb.com/cgi-bin/test.cgi
+301   169B   http://testphp.vulnweb.com/Connections    -> REDIRECTS TO: http://testphp.vulnweb.com/Connections/
+200   224B   http://testphp.vulnweb.com/crossdomain.xml
+200   595B   http://testphp.vulnweb.com/CVS/
+200     1B   http://testphp.vulnweb.com/CVS/Entries
+200     1B   http://testphp.vulnweb.com/CVS/Root
+200   894B   http://testphp.vulnweb.com/favicon.ico
+301   169B   http://testphp.vulnweb.com/images    -> REDIRECTS TO: http://testphp.vulnweb.com/images/
+200   377B   http://testphp.vulnweb.com/images/
+200     3KB  http://testphp.vulnweb.com/index.bak
+200     3KB  http://testphp.vulnweb.com/index.zip
+200     5KB  http://testphp.vulnweb.com/login.php
+200     5KB  http://testphp.vulnweb.com/logout.php
+301   169B   http://testphp.vulnweb.com/pictures    -> REDIRECTS TO: http://testphp.vulnweb.com/pictures/
+200     5KB  http://testphp.vulnweb.com/product.php
+200     5KB  http://testphp.vulnweb.com/search.php
+301   169B   http://testphp.vulnweb.com/secured    -> REDIRECTS TO: http://testphp.vulnweb.com/secured/
+200     6KB  http://testphp.vulnweb.com/signup.php
+302    14B   http://testphp.vulnweb.com/userinfo.php    -> REDIRECTS TO: login.php
+200   268B   http://testphp.vulnweb.com/vendor/

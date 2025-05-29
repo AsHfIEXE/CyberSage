@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CyberSage - Scan Results: {{ scan.target }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
+    <style>
+        .custom-scrollbar::-webkit-scrollbar { width: 8px; height: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #1f2937; border-radius: 10px;}
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 10px;}
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #6b7280; }
+        .sticky-header th { position: sticky; top: 0; z-index: 10; background-color: #1f2937; }
+        .modal-backdrop { background-color: rgba(0,0,0,0.75); }
+        .modal-content { max-height: 85vh; }
+        .prose-invert table { width: 100%; } .prose-invert th, .prose-invert td { border: 1px solid #374151; padding: 0.5em 0.75em;}
+        .prose-invert code::before, .prose-invert code::after { content: ""; }
+        .prose-invert code { background-color: #374151; padding: 0.1em 0.3em; border-radius: 0.25rem; font-size: 0.85em; }
+        .prose-invert pre { background-color: #1f2937; padding: 1em; border-radius: 0.375rem; overflow-x: auto; }
+        .prose-invert pre code { background-color: transparent; padding: 0; font-size: 0.875em; }
+        .prose-invert ul { list-style-type: disc; margin-left: 1.25rem; } .prose-invert ol { list-style-type: decimal; margin-left: 1.25rem; }
+        .prose-invert strong { color: #d1d5db; } 
+        #detailed-results-tabs button[aria-selected="true"] { border-color: #6366f1 !important; color: #a5b4fc !important; }
+        #detailed-results-tabs button { border-color: transparent; }
+    </style>
+</head>
+<body class="bg-gray-950 text-gray-200 font-sans min-h-screen">
+    <header class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center">
+            <a href="{{ url_for('index') }}"><h1 class="text-3xl font-bold text-indigo-500 hover:text-indigo-400 transition-colors">CyberSage Scan Results</h1></a>
+            <a href="{{ url_for('index') }}" class="text-sm bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-md transition">New Scan</a>
+        </div>
+        <div class="mt-3 text-sm text-gray-400 bg-gray-800 p-4 rounded-lg shadow">
+            <p><span class="font-semibold text-gray-300">Scan ID:</span> <code class="bg-gray-700 px-1 rounded text-indigo-300">{{ scan.scan_id }}</code></p>
+            <p><span class="font-semibold text-gray-300">Target:</span> <code class="bg-gray-700 px-1 rounded text-indigo-300">{{ scan.target }}</code></p>
+            <p><span class="font-semibold text-gray-300">Status:</span> 
+                <span id="scanPageStatus" class="font-bold 
+                {% if scan.status.startswith('completed_with_findings') %}text-green-400
+                {% elif scan.status.startswith('completed_no_major_vulns') %}text-teal-400
+                {% elif scan.status.startswith('completed_recon_only') %}text-blue-400
+                {% elif scan.status.startswith('completed_no_significant_data') %}text-gray-300
+                {% elif scan.status.startswith('completed_with_tool_errors') %}text-orange-400
+                {% elif scan.status == 'running' %}text-blue-400
+                {% elif scan.status == 'pending' %}text-yellow-400
+                {% elif scan.status.startswith('failed') %}text-red-400
+                {% else %}text-gray-300{% endif %}">{{ scan.status.replace('_', ' ').title() }}</span>
+            </p>
+            <p><span class="font-semibold text-gray-300">Started:</span> {{ scan.start_time_str }} 
+               {% if scan.end_time_str != 'N/A' %} | <span class="font-semibold text-gray-300">Ended:</span> {{ scan.end_time_str }} {% endif %}
+            </p>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 pb-16">
+        {% if scan.status == 'running' or scan.status == 'pending' %}
+        <section id="live-progress-section" class="bg-gray-900 p-4 sm:p-6 rounded-xl shadow-lg">
+            <h2 class="text-xl sm:text-2xl font-semibold text-indigo-300 mb-4">Live Scan Progress</h2>
+            <div class="w-full bg-gray-700 rounded-full h-2.5 mb-1"><div id="results-progress-bar" class="bg-indigo-500 h-2.5 rounded-full transition-all duration-300 ease-out" style="width: 0%"></div></div>
+            <p id="results-progress-bar-text" class="text-xs text-gray-400 text-center mb-3">0%</p>
+            <div id="results-status-text-container" class="max-h-60 overflow-y-auto bg-gray-800 p-3 rounded-md custom-scrollbar"><ul id="results-status-events" class="text-xs text-gray-300 space-y-1"><li>Waiting for scan updates...</li></ul></div>
+        </section>
+        {% endif %}
+
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {% for summary_title, summary_text in summaries.items() if summary_title in ['AI Analysis', 'Scan Overview'] %}
+            <div class="bg-gray-900 p-4 sm:p-6 rounded-xl shadow-lg min-h-[150px] max-h-[400px] overflow-y-auto custom-scrollbar">
+                <h2 class="text-xl sm:text-2xl font-semibold text-indigo-300 mb-3">{{ summary_title }}</h2>
+                <div class="text-sm text-gray-300 whitespace-pre-wrap prose prose-sm prose-invert max-w-none">{{ summary_text|safe }}</div>
+            </div>
+            {% endfor %}
+        </section>
+
+        <section class="bg-gray-900 p-4 sm:p-6 rounded-xl shadow-lg">
+            <h2 class="text-xl sm:text-2xl font-semibold text-indigo-300 mb-4">Vulnerability Severity Chart</h2>
+            {% if scan.chart_path %}<img id="vulnChartImage" src="{{ scan.chart_path }}?t={{ scan.timestamp_for_cache_bust }}" class="w-full max-w-2xl mx-auto rounded-md border border-gray-700 shadow-md" alt="Vulnerability Severity Chart">
+            {% else %}<p class="text-gray-400 text-sm">Chart not available (no applicable findings or scan incomplete/failed).</p>{% endif %}
+        </section>
+        
+        <div class="mb-4 border-b border-gray-700">
+            <ul class="flex flex-wrap -mb-px text-sm font-medium text-center" id="detailed-results-tabs" data-tabs-active-classes="text-indigo-400 hover:text-indigo-300 border-indigo-500" data-tabs-inactive-classes="hover:text-gray-300 hover:border-gray-500 border-transparent" role="tablist">
+                <li class="mr-2" role="presentation"><button class="inline-block p-4 border-b-2 rounded-t-lg" id="vulns-tab" data-tabs-target="#vulns-content" type="button" role="tab" aria-controls="vulns-content" aria-selected="true">Vulnerabilities ({{ vulnerabilities|length }})</button></li>
+                <li class="mr-2" role="presentation"><button class="inline-block p-4 border-b-2 rounded-t-lg" id="recon-tab" data-tabs-target="#recon-content" type="button" role="tab" aria-controls="recon-content" aria-selected="false">Reconnaissance</button></li>
+                <li class="mr-2" role="presentation"><button class="inline-block p-4 border-b-2 rounded-t-lg" id="scan-tab" data-tabs-target="#scan-content" type="button" role="tab" aria-controls="scan-content" aria-selected="false">Port Scanning</button></li>
+                <li class="mr-2" role="presentation"><button class="inline-block p-4 border-b-2 rounded-t-lg" id="webscan-tab" data-tabs-target="#webscan-content" type="button" role="tab" aria-controls="webscan-content" aria-selected="false">Web Server & SQLi</button></li>
+                <li class="mr-2" role="presentation"><button class="inline-block p-4 border-b-2 rounded-t-lg" id="ssl-tab" data-tabs-target="#ssl-content" type="button" role="tab" aria-controls="ssl-content" aria-selected="false">SSL/TLS ({{ ssl_tests|length }})</button></li>
+                <li role="presentation"><button class="inline-block p-4 border-b-2 rounded-t-lg" id="exploit-tab" data-tabs-target="#exploit-content" type="button" role="tab" aria-controls="exploit-content" aria-selected="false">Exploits</button></li>
+            </ul>
+        </div>
+        <div id="detailed-results-tab-content">
+            <!-- Vulnerabilities Content (Main Table) -->
+            <div class="hidden p-4 rounded-lg bg-gray-900" id="vulns-content" role="tabpanel" aria-labelledby="vulns-tab">
+                <input id="vuln-filter" type="text" placeholder="🔎 Filter vulnerabilities by keyword, severity, tool..." class="w-full mb-4 px-3 py-2 bg-gray-800 border border-gray-700 rounded-md focus:ring-1 focus:ring-indigo-500 text-gray-100 placeholder-gray-500 text-sm">
+                <div class="overflow-x-auto max-h-[500px] custom-scrollbar">
+                    <table id="vuln-table" class="w-full table-auto text-xs text-left text-gray-300">
+                        <thead class="bg-gray-800 text-gray-400 sticky-header"><tr><th class="p-2">Severity</th><th class="p-2">Tool</th><th class="p-2">Type/Name</th><th class="p-2">Description</th><th class="p-2">Affected</th><th class="p-2">Tags</th><th class="p-2">Details</th></tr></thead>
+                        <tbody>
+                        {% if vulnerabilities %}{% for vuln in vulnerabilities %}<tr class="border-b border-gray-700 hover:bg-gray-850">
+                                <td class="p-2 font-semibold {% if vuln.severity == 'Critical' %}text-red-500{%elif vuln.severity == 'High' %}text-orange-400{%elif vuln.severity == 'Medium' %}text-yellow-400{%elif vuln.severity == 'Low' %}text-blue-400{%else%}text-teal-400{%endif%}">{{vuln.severity}}</td>
+                                <td class="p-2">{{vuln.scan_tool}}</td><td class="p-2 font-medium">{{vuln.type|title|truncate(40)}}</td>
+                                <td class="p-2">{{vuln.description|striptags|truncate(80)}}</td>
+                                <td class="p-2"><a href="{{vuln.affected_url if vuln.affected_url and (vuln.affected_url.startswith('http') or vuln.affected_url.startswith('/')) else '#'}}" class="text-indigo-400 hover:underline break-all" target="_blank" rel="noopener noreferrer">{{vuln.affected_url|truncate(40)}}</a></td>
+                                <td class="p-2 text-gray-400">{{ (vuln.tags or 'N/A') |truncate(30) }}</td>
+                                <td class="p-2"><button type="button" onclick="showVulnModal({{loop.index0}})" class="text-indigo-400 hover:text-indigo-300 text-xs bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded">View</button></td>
+                            </tr>{% endfor %}{% else %}<tr><td colspan="7" class="p-4 text-center text-gray-400">No vulnerabilities found or processed for this table.</td></tr>{% endif %}
+                        </tbody></table></div><div id="allVulnsData" style="display:none;">{{vulnerabilities|tojson|safe}}</div></div>
+
+            <!-- Reconnaissance Content -->
+            <div class="hidden p-4 rounded-lg bg-gray-900 space-y-4" id="recon-content" role="tabpanel" aria-labelledby="recon-tab">
+                <div><h3 class="text-lg font-semibold text-indigo-300 mb-2">Subdomains (Subfinder) ({{ subdomains|length }})</h3>
+                {% if subdomains %}<div class="max-h-60 overflow-y-auto custom-scrollbar bg-gray-800 p-3 rounded-md"><ul class="list-disc list-inside pl-2 space-y-1 text-gray-300 text-sm">{% for sub in subdomains %}<li>{{ sub }}</li>{% endfor %}</ul></div>{% else %}<p class="text-sm text-gray-400">No subdomains found by Subfinder.</p>{% endif %}</div>
+                <div><h3 class="text-lg font-semibold text-indigo-300 mt-4 mb-2">Live Web Hosts (HTTPX) ({{ live_hosts_httpx|length }})</h3>
+                {% if live_hosts_httpx %}<div class="max-h-60 overflow-y-auto custom-scrollbar bg-gray-800 p-3 rounded-md space-y-2">{% for host in live_hosts_httpx %}<div class="text-xs border-b border-gray-700 pb-1 mb-1"><strong class="text-indigo-400">{{host.url}}</strong> ({{host.status_code}}) - Title: {{host.title|truncate(50)|default('N/A',true)}}<br/>Server: {{host.webserver|default('N/A',true)}} | Tech: {{(host.technologies|join(', ') if host.technologies else 'N/A')|truncate(60)}}</div>{% endfor %}</div>{% else %}<p class="text-sm text-gray-400">No live web hosts identified by HTTPX.</p>{% endif %}</div>
+                <div><h3 class="text-lg font-semibold text-indigo-300 mt-4 mb-2">Crawled Endpoints (Katana) ({{ crawled_endpoints|length }})</h3>
+                {% if crawled_endpoints %}<div class="max-h-60 overflow-y-auto custom-scrollbar bg-gray-800 p-3 rounded-md"><ul class="list-disc list-inside pl-2 space-y-1 text-gray-300 text-sm">{% for ep in crawled_endpoints %}<li><span class="font-semibold">{{ep.method}}</span>: <a href="{{ep.endpoint}}" target="_blank" class="text-indigo-400 hover:underline">{{ ep.endpoint }}</a></li>{% endfor %}</ul></div>{% else %}<p class="text-sm text-gray-400">No endpoints crawled by Katana.</p>{% endif %}</div>
+                <div><h3 class="text-lg font-semibold text-indigo-300 mt-4 mb-2">Directory Enumeration (Dirsearch) ({{ dirsearch_paths|length }})</h3>
+                {% if dirsearch_paths %}<div class="max-h-60 overflow-y-auto custom-scrollbar bg-gray-800 p-3 rounded-md"><ul class="list-disc list-inside pl-2 space-y-1 text-gray-300 text-sm">{% for pinfo in dirsearch_paths %}<li><a href="{{ pinfo.target_base_url.strip('/') }}/{{ pinfo.path.strip('/') }}" target="_blank" class="text-indigo-400 hover:underline">{{pinfo.path}}</a> ({{pinfo.status_code}})</li>{% endfor %}</ul></div>{% else %}<p class="text-sm text-gray-400">No paths found by Dirsearch or tool skipped.</p>{% endif %}</div>
+            </div>
+            <div>
+                <h3 class="text-lg font-semibold text-indigo-300 mt-4 mb-2">Directory Enumeration (Dirsearch) ({{ dirsearch_paths|length }})</h3>
+                {% if dirsearch_paths %}
+                    <div class="max-h-60 overflow-y-auto custom-scrollbar bg-gray-800 p-3 rounded-md">
+                        <ul class="list-disc list-inside pl-2 space-y-1 text-gray-300 text-sm">
+                        {% for path_info in dirsearch_paths %}
+                            <li>
+                                <a href="{{ path_info.target_base_url.strip('/') }}/{{ path_info.path.strip('/') }}" target="_blank" class="text-indigo-400 hover:underline">
+                                    {{ path_info.path }}
+                                </a> 
+                                (Status: {{ path_info.status_code }}, Size: {{ path_info.content_length }})
+                                {% if path_info.redirect %} -> Redirects to: {{ path_info.redirect }} {% endif %}
+                            </li>
+                        {% endfor %}
+                        </ul>
+                    </div>
+                {% elif scan.status.startswith('completed') and 'dirsearch' in tool_run_outcomes and tool_run_outcomes.dirsearch >= 0 %}
+                    <p class="text-sm text-gray-400">Dirsearch ran but did not find any accessible paths based on the configured options.</p>
+                {% else %}
+                    <p class="text-sm text-gray-400">No paths found by Dirsearch, tool was skipped or an error occurred during its execution. Check logs for details.</p>
+                {% endif %}
+            </div>
+            <!-- Scanning Content (Nmap Ports/Services, Whatweb Tech) -->
+            <div class="hidden p-4 rounded-lg bg-gray-900 space-y-4" id="scan-content" role="tabpanel" aria-labelledby="scan-tab">
+                <div><h3 class="text-lg font-semibold text-indigo-300 mb-2">Open Ports (Nmap) ({{ ports|length }})</h3>
+                {% if ports %}<div class="overflow-x-auto max-h-72 custom-scrollbar"><table class="w-full table-auto text-xs text-left text-gray-300"><thead class="bg-gray-800 text-gray-400 sticky-header"><tr><th class="p-2">IP</th><th class="p-2">Port</th><th class="p-2">Proto</th><th class="p-2">State</th></tr></thead><tbody>{% for p in ports %}<tr class="border-b border-gray-700 hover:bg-gray-850"><td class="p-2">{{p.ip}}</td><td class="p-2">{{p.port}}</td><td class="p-2">{{p.protocol}}</td><td class="p-2">{{p.state}}</td></tr>{% endfor %}</tbody></table></div>{% else %}<p class="text-sm text-gray-400">No open ports found by Nmap.</p>{% endif %}</div>
+                <div><h3 class="text-lg font-semibold text-indigo-300 mt-4 mb-2">Services (Nmap) ({{ services|length }})</h3>
+                {% if services %}<div class="overflow-x-auto max-h-72 custom-scrollbar"><table class="w-full table-auto text-xs text-left text-gray-300"><thead class="bg-gray-800 text-gray-400 sticky-header"><tr><th class="p-2">Host</th><th class="p-2">Port</th><th class="p-2">Service</th><th class="p-2">Version</th><th class="p-2">Banner/Scripts</th></tr></thead><tbody>{% for s in services %}<tr class="border-b border-gray-700 hover:bg-gray-850"><td class="p-2">{{s.host}}</td><td class="p-2">{{s.port}}</td><td class="p-2">{{s.service}}</td><td class="p-2">{{s.version|truncate(50)}}</td><td class="p-2">{{s.banner if s.banner else s.scripts_summary}}</td></tr>{% endfor %}</tbody></table></div>{% else %}<p class="text-sm text-gray-400">No services identified by Nmap.</p>{% endif %}</div>
+                <div><h3 class="text-lg font-semibold text-indigo-300 mt-4 mb-2">Technologies (WhatWeb) ({{ tech_id|length }})</h3>
+                {% if tech_id %}<div class="max-h-72 overflow-y-auto custom-scrollbar space-y-2">{% for t in tech_id %}<details class="bg-gray-800 p-2 rounded"><summary class="text-xs text-indigo-400 cursor-pointer">{{t.target_url}}</summary><pre class="text-xs p-2 bg-gray-700 rounded mt-1 custom-scrollbar overflow-auto">{{ t.data | tojson(indent=2) }}</pre></details>{% endfor %}</div>{% else %}<p class="text-sm text-gray-400">No technologies identified by WhatWeb.</p>{% endif %}</div>
+            </div>
+            
+            <!-- Web Server Scan Content (Nikto & SQLMap are here now) -->
+            <div class="hidden p-4 rounded-lg bg-gray-900" id="webscan-content" role="tabpanel" aria-labelledby="webscan-tab">
+                 <h3 class="text-lg font-semibold text-indigo-300 mb-2">Web Server Scan (Nikto) ({{ nikto_findings|length }})</h3>
+                 {% if nikto_findings %}
+                    <div class="space-y-2 max-h-80 overflow-y-auto custom-scrollbar bg-gray-800 p-3 rounded-md">
+                    {% for finding in nikto_findings %}
+                        <div class="text-xs border-b border-gray-700 py-2">
+                            <p class="text-indigo-400">URL: <a href="{{finding.url if finding.url and finding.url.startswith('http') else finding.target_url}}" target="_blank" class="hover:underline">{{ finding.url if finding.url else finding.target_url }}</a></p>
+                            <p class="text-gray-300 mt-1">Message: {{ finding.msg | safe }}</p>
+                            {% if finding.osvdbid and finding.osvdbid != "0" %}<p class="text-gray-500 mt-1">OSVDB: {{ finding.osvdbid }}</p>{% endif %}
+                        </div>
+                    {% endfor %}
+                    </div>
+                 {% else %}<p class="text-sm text-gray-400">No Nikto findings or tool not run.</p>{% endif %}
+
+                 <h3 class="text-lg font-semibold text-indigo-300 mt-4 mb-2">SQL Injection Scan (SQLMap) ({{ sqlmap_findings|length }})</h3>
+                 {% if sqlmap_findings %}
+                    <div class="space-y-2 max-h-80 overflow-y-auto custom-scrollbar bg-gray-800 p-3 rounded-md">
+                    {% for finding in sqlmap_findings %}
+                        <div class="text-xs border-b border-gray-700 py-2">
+                            <p class="text-red-400 font-semibold">Target: {{finding.target_url}}</p>
+                            <p>Parameter: <code class="text-sm bg-gray-700 px-1 rounded">{{finding.parameter}}</code></p>
+                            <p>Notes: {{finding.notes}}</p>
+                            {% if finding.payload_example %}<p>Example Payload: <code class="text-xs bg-gray-700 px-1 rounded">{{finding.payload_example}}</code></p>{% endif %}
+                            {% if finding.dbms %}<p>DBMS: {{finding.dbms}}</p>{% endif %}
+                        </div>
+                    {% endfor %}
+                    </div>
+                 {% else %}<p class="text-sm text-gray-400">No SQLMap findings or tool not run.</p>{% endif %}
+            </div>
+
+            <!-- SSL/TLS Content -->
+            <div class="hidden p-4 rounded-lg bg-gray-900" id="ssl-content" role="tabpanel" aria-labelledby="ssl-tab">
+                <h3 class="text-lg font-semibold text-indigo-300 mb-2">SSL/TLS Test Summary (testssl.sh) ({{ ssl_tests|length }})</h3>
+                {% if ssl_tests %}<div class="space-y-3 max-h-96 overflow-y-auto custom-scrollbar">
+                    {% for test_result in ssl_tests %}<div class="bg-gray-800 p-3 rounded-md text-xs">
+                        <p class="font-semibold text-indigo-400">Target: {{ test_result.target }}</p>
+                        <p>Overall Rating: <span class="font-medium">{{ test_result.overall_rating }}</span></p>
+                        {% if test_result.key_issues %}<p class="mt-1 font-medium text-gray-300">Key Issues ({{ test_result.key_issues|length }}):</p><ul class="list-disc list-inside pl-4 text-gray-400">
+                        {% for issue in test_result.key_issues %}<li><span class="font-semibold {{ 'text-red-400' if issue.severity in ['FATAL', 'ERROR'] else 'text-yellow-400' if issue.severity == 'WARN' else 'text-blue-400' }}">{{ issue.severity }}:</span> {{ issue.id }} - {{ issue.finding | truncate(100) }}</li>{% endfor %}</ul>
+                        {% else %}<p class="text-gray-400">No major issues highlighted.</p>{% endif %}
+                        <p class="mt-1 text-gray-500">Full JSON report: {{ test_result.full_report_filename }} (server-side)</p>
+                    </div>{% endfor %}</div>
+                {% else %}<p class="text-sm text-gray-400">No SSL/TLS test results or tool not run.</p>{% endif %}
+            </div>
+
+            <!-- Exploits Content -->
+            <div class="hidden p-4 rounded-lg bg-gray-900" id="exploit-content" role="tabpanel" aria-labelledby="exploit-tab">
+                <h3 class="text-lg font-semibold text-indigo-300 mb-2">Exploit References (SearchSploit) ({{ exploit_refs|length }})</h3>
+                 {% if exploit_refs %}<div class="max-h-72 overflow-y-auto custom-scrollbar bg-gray-800 p-3 rounded"><ul class="list-disc list-inside pl-2 space-y-2 text-gray-300 text-sm">{% for ex in exploit_refs %}<li><span class="font-semibold">{{ex.title}}</span> (For: {{ex.lookup_term}})<br/>Path: <code class="text-xs">{{ex.path}}</code> [Verified: {{ex.verified}}]</li>{% endfor %}</ul></div>{% else %}<p class="text-sm text-gray-400">None found.</p>{% endif %}
+            </div>
+        </div>
+    </main>
+
+    <!-- Vulnerability Detail Modal HTML (Keep as is) -->
+    <div id="vulnDetailModal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-modal md:h-full modal-backdrop">
+        <div class="relative p-4 w-full max-w-3xl h-full md:h-auto">
+            <div class="relative bg-gray-800 rounded-lg shadow modal-content custom-scrollbar overflow-y-auto">
+                <div class="flex justify-between items-start p-5 rounded-t border-b border-gray-700 sticky top-0 bg-gray-800 z-10">
+                    <h3 class="text-xl font-semibold text-indigo-300" id="modalVulnName">Vulnerability Details</h3>
+                    <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-600 hover:text-white rounded-lg text-sm p-1.5 ml-auto inline-flex items-center" onclick="hideVulnModal()">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                    </button>
+                </div>
+                <div class="p-6 space-y-4 text-sm">
+                    <p><strong>Severity:</strong> <span id="modalVulnSeverity" class="font-semibold"></span></p>
+                    <p><strong>Tool:</strong> <span id="modalVulnTool"></span></p>
+                    <p><strong>Type/Name:</strong> <span id="modalVulnType"></span></p>
+                    <p><strong>Affected:</strong> <a id="modalVulnAffectedUrl" href="#" target="_blank" rel="noopener noreferrer" class="text-indigo-400 hover:underline break-all"></a></p>
+                    <div><strong>Description:</strong> <div id="modalVulnDescription" class="mt-1 p-2 bg-gray-700 rounded whitespace-pre-wrap"></div></div>
+                    <div><strong>Tags:</strong> <span id="modalVulnTags" class="p-2 bg-gray-700 rounded inline-block"></span></div>
+                    <div><strong>Full Data:</strong> <pre id="modalVulnFullData" class="mt-1 p-2 bg-gray-700 rounded text-xs overflow-auto max-h-60 custom-scrollbar"></pre></div>
+                </div>
+                <div class="flex items-center p-6 space-x-2 rounded-b border-t border-gray-700 sticky bottom-0 bg-gray-800 z-10">
+                    <button onclick="hideVulnModal()" type="button" class="text-white bg-indigo-600 hover:bg-indigo-700 focus:ring-4 focus:outline-none focus:ring-indigo-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="max-w-6xl mx-auto py-8 px-4 text-center text-gray-600 text-sm"><p>© <span id="currentYearResults"></span> CyberSage.</p></footer>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
+    <script>
+        // Full JavaScript from my response at:
+        // https://docs.anthropic.com/claude/docs/ckv_sandrabeam-1-19__fcbdf6aeced78_message_1759b3f55d21--SOVRZVMTCKV2024MAY.backend_point_turn_%20heralded#6748a46f-a854-454c-94e1-f642f1b2c52e
+        // Ensure this is the complete script block.
+        document.getElementById('currentYearResults').textContent = new Date().getFullYear();
+        const vulnFilterInput = document.getElementById('vuln-filter');
+        if(vulnFilterInput) {
+            vulnFilterInput.addEventListener('input', function(){
+                const filter = this.value.toLowerCase();
+                document.querySelectorAll('#vuln-table tbody tr').forEach(row => {
+                    const rowText = row.innerText.toLowerCase();
+                    row.style.display = rowText.includes(filter) ? '' : 'none';
+                });
+            });
+        }
+
+        let fullVulnerabilitiesData = [];
+        const vulnsDataElement = document.getElementById('allVulnsData');
+        if (vulnsDataElement && vulnsDataElement.textContent) {
+            try { fullVulnerabilitiesData = JSON.parse(vulnsDataElement.textContent); } 
+            catch (e) { console.error("Error parsing vulnerability data for modal:", e); }
+        }
+        
+        const modalElement = document.getElementById('vulnDetailModal');
+        let flowbiteModalInstance; // Renamed to avoid conflict if 'modal' is a Flowbite global
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof Modal !== 'undefined' && modalElement) {
+                flowbiteModalInstance = new Modal(modalElement, { placement: 'center-center', backdrop: 'dynamic', closable: true });
+            }
+            const tabsElement = document.getElementById('detailed-results-tabs');
+            if (tabsElement && typeof Tabs !== 'undefined') {
+                const tabItems = [];
+                document.querySelectorAll('#detailed-results-tabs button[data-tabs-target]').forEach(button => {
+                    const targetEl = document.querySelector(button.getAttribute('data-tabs-target'));
+                    if (targetEl) { // Only add if target element exists
+                        tabItems.push({
+                            id: button.getAttribute('aria-controls'),
+                            triggerEl: button,
+                            targetEl: targetEl
+                        });
+                    }
+                });
+                if (tabItems.length > 0 && !tabsElement._destroy) { // Check if not already initialized by Flowbite
+                    new Tabs(tabsElement, tabItems, {
+                        defaultTabId: tabItems[0].id, 
+                        activeClasses: 'text-indigo-400 hover:text-indigo-300 border-indigo-500',
+                        inactiveClasses: 'text-gray-400 hover:text-gray-300 border-transparent hover:border-gray-500',
+                    });
+                }
+            }
+        });
+
+        function showVulnModal(index) {
+            if (index < 0 || index >= fullVulnerabilitiesData.length) return;
+            const vulnData = fullVulnerabilitiesData[index];
+            document.getElementById('modalVulnName').textContent = vulnData.type || "Vulnerability Details";
+            document.getElementById('modalVulnSeverity').textContent = vulnData.severity || "N/A";
+            document.getElementById('modalVulnTool').textContent = vulnData.scan_tool || "N/A";
+            document.getElementById('modalVulnType').textContent = vulnData.type || "N/A";
+            const affectedUrlElem = document.getElementById('modalVulnAffectedUrl');
+            affectedUrlElem.textContent = vulnData.affected_url || "N/A";
+            affectedUrlElem.href = (vulnData.affected_url && (vulnData.affected_url.startsWith('http') || vulnData.affected_url.startsWith('/'))) ? vulnData.affected_url : "#";
+            document.getElementById('modalVulnDescription').textContent = vulnData.description || "No description.";
+            document.getElementById('modalVulnTags').textContent = vulnData.tags || "None";
+            document.getElementById('modalVulnFullData').textContent = JSON.stringify(vulnData.data || vulnData, null, 2);
+            const severityClass = (vulnData.severity || 'unknown').toLowerCase();
+            const severityElem = document.getElementById('modalVulnSeverity');
+            severityElem.className = 'font-semibold'; 
+            if (severityClass === 'critical') severityElem.classList.add('text-red-500');
+            else if (severityClass === 'high') severityElem.classList.add('text-orange-400');
+            else if (severityClass === 'medium') severityElem.classList.add('text-yellow-400');
+            else if (severityClass === 'low') severityElem.classList.add('text-blue-400');
+            else severityElem.classList.add('text-teal-400');
+            if (flowbiteModalInstance) { flowbiteModalInstance.show(); } 
+            else { modalElement.classList.remove('hidden'); modalElement.classList.add('flex'); document.body.classList.add('overflow-hidden'); }
+        }
+        function hideVulnModal() { if (flowbiteModalInstance) { flowbiteModalInstance.hide(); } else { modalElement.classList.add('hidden'); modalElement.classList.remove('flex'); document.body.classList.remove('overflow-hidden');}}
+        window.hideVulnModal = hideVulnModal;
+
+        const scanStatusOnPage = "{{ scan.status.lower() }}"; 
+        const scanId = "{{ scan.scan_id }}";
+        let eventSourceResults; 
+        function initializeResultsSSE(currentScanId){ /* ... (Full SSE Logic from previous comprehensive result.html) ... */ 
+            if(eventSourceResults && eventSourceResults.readyState !== EventSource.CLOSED) { eventSourceResults.close(); }
+            eventSourceResults = new EventSource(`/progress/${currentScanId}`);
+            const progressBar = document.getElementById('results-progress-bar');
+            const progressBarText = document.getElementById('results-progress-bar-text');
+            const statusEventsList = document.getElementById('results-status-events');
+            if(statusEventsList && statusEventsList.firstChild && statusEventsList.firstChild.textContent.includes("Waiting")) { statusEventsList.innerHTML = ''; }
+            eventSourceResults.onmessage = function(event){
+                const data = JSON.parse(event.data);
+                if(data.message === "SSE_STREAM_END"){
+                    console.log("Results SSE End. Closing."); eventSourceResults.close();
+                    setTimeout(() => { 
+                        const currentScanPageStatusElem = document.getElementById('scanPageStatus');
+                        if(currentScanPageStatusElem){ const currentScanPageStatus = currentScanPageStatusElem.textContent.toLowerCase(); if (currentScanPageStatus.includes('running') || currentScanPageStatus.includes('pending')) { window.location.reload(); }} else { window.location.reload(); }
+                    }, 2000); return;
+                }
+                if(progressBar && data.percent_complete !== undefined){ progressBar.style.width = data.percent_complete+'%'; if(progressBarText) progressBarText.textContent = data.percent_complete+'%';}
+                if (statusEventsList) {
+                    const listItem = document.createElement('li'); let statusText = (data.status || 'INFO').toUpperCase(); let statusColorClass = 'text-gray-300'; 
+                    let prefix = `[${statusText}] `;
+                    if (data.status === "SUCCESS") { statusColorClass = 'text-green-400'; } else if (data.status === "ERROR") { statusColorClass = 'text-red-400'; }
+                    else if (data.status === "WARNING") { statusColorClass = 'text-yellow-400'; } else if (data.status === "STAGE_START") { prefix = `🚀 [${statusText}] `; }
+                    else if (data.status === "STAGE_END") { prefix = `✅ [${statusText}] `; }
+                    listItem.className = statusColorClass; listItem.innerHTML = `[${new Date(data.timestamp).toLocaleTimeString()}] ${prefix}<strong>${data.tool?data.tool+': ':''}</strong>${data.message}`;
+                    statusEventsList.appendChild(listItem); statusEventsList.scrollTop = statusEventsList.scrollHeight; 
+                }
+                if (data.tool === "Core" && (data.message.toLowerCase().includes("scan completed") || data.message.toLowerCase().includes("scan failed") || data.message.toLowerCase().includes("scan ended with status"))) {
+                    const mainStatusElem = document.getElementById('scanPageStatus');
+                    if(mainStatusElem) {
+                        let finalScanStatusText = "Unknown"; let finalScanStatusClass = 'font-semibold text-gray-400';
+                        const msgLower = data.message.toLowerCase();
+                        if (msgLower.includes("completed_with_findings")) { finalScanStatusText = "Completed (Findings)"; finalScanStatusClass = 'font-semibold text-green-400';}
+                        else if (msgLower.includes("completed_no_major_vulns")) { finalScanStatusText = "Completed (No Major Vulns)"; finalScanStatusClass = 'font-semibold text-teal-400';}
+                        else if (msgLower.includes("completed_recon_only")) { finalScanStatusText = "Completed (Recon Only)"; finalScanStatusClass = 'font-semibold text-blue-400';}
+                        else if (msgLower.includes("completed_with_tool_errors")) { finalScanStatusText = "Completed (Tool Errors)"; finalScanStatusClass = 'font-semibold text-orange-400';}
+                        else if (msgLower.includes("completed_no_significant_data")) { finalScanStatusText = "Completed (No Significant Data)"; finalScanStatusClass = 'font-semibold text-gray-300';}
+                        else if (msgLower.includes("failed_exception") || msgLower.includes("critically failed")) { finalScanStatusText = "Failed (Critical Error)"; finalScanStatusClass = 'font-semibold text-red-500';}
+                        else if (msgLower.includes("scan failed")) { finalScanStatusText = "Failed"; finalScanStatusClass = 'font-semibold text-red-400';}
+                        else { finalScanStatusText = "Ended (Status Updated)"; }
+                        mainStatusElem.textContent = finalScanStatusText.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                        mainStatusElem.className = finalScanStatusClass;
+                    }
+                    const liveProgressSection = document.getElementById('live-progress-section');
+                    if (liveProgressSection && (finalScanStatusText && !finalScanStatusText.toLowerCase().includes('running') && !finalScanStatusText.toLowerCase().includes('pending'))) {
+                        setTimeout(() => { liveProgressSection.style.display = 'none'; }, 4000); 
+                    }
+                }
+                if (data.tool === "ChartGen" && data.status === "SUCCESS") {
+                    const chartImg = document.getElementById('vulnChartImage');
+                    if (chartImg && chartImg.src) { const baseSrc = chartImg.src.split('?')[0]; chartImg.src = `${baseSrc}?t=${new Date().getTime()}`; }
+                }
+            };
+            eventSourceResults.onerror = function(error){ console.error("Results SSE Error:", error); if (statusEventsList) { const li=document.createElement('li'); li.className = 'text-red-500'; li.textContent = `[${new Date().toLocaleTimeString()}] SSE Connection error.`; statusEventsList.appendChild(li);}};
+            eventSourceResults.onopen = function(){ console.log("Results SSE open: " + currentScanId); if (statusEventsList && statusEventsList.firstChild && statusEventsList.firstChild.textContent.includes("Waiting...")) { statusEventsList.innerHTML = ''; }};
+            setTimeout(() => { if (eventSourceResults && eventSourceResults.readyState !== EventSource.CLOSED) { const sse = document.getElementById('scanPageStatus'); if (sse && (sse.textContent.toLowerCase().includes('running') || sse.textContent.toLowerCase().includes('pending'))) { console.warn(`SSE for ${currentScanId} timed out.`); eventSourceResults.close(); window.location.reload();}}}, 30 * 60 * 1000); 
+        }
+        if (scanStatusOnPage === 'running' || scanStatusOnPage === 'pending') {
+            const lps = document.getElementById('live-progress-section'); if(lps)lps.style.display = 'block';
+            initializeResultsSSE(scanId);
+        } else { const lps = document.getElementById('live-progress-section'); if(lps)lps.style.display = 'none'; }
+    </script>
+</body>
+</html>

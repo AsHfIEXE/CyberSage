@@ -1,0 +1,79 @@
+# CyberSageV2/config/tools.yaml
+# --- Tool Selection ---
+recon_tools:
+  subdomain_discovery: ["subfinder"]
+  directory_enumeration: ["dirsearch"]
+crawl_tools:
+  endpoint_discovery: ["katana"]
+scan_tools:
+  service_and_version_scanning: ["nmap"] # Nmap for ports and services
+  ssl_testing: ["testssl"]
+  web_server_vuln_scanning: ["nikto"]
+service_id_tools:
+  technology_identification: ["whatweb"]
+vuln_scan_tools:
+  template_based_scanning: ["nuclei"]
+  xss_specific_scanning: ["dalfox"]
+  sqli_specific_scanning: ["sqlmap"]
+exploit_tools:
+  cve_exploitation: ["searchsploit"]
+
+# --- Tool Paths (CRITICAL: VERIFY THESE ARE CORRECT FOR YOUR SYSTEM) ---
+# For Go tools (subfinder, httpx, katana, nuclei, dalfox), use absolute paths
+# e.g., /home/ashfiexe/go/bin/toolname
+# For cloned tools (testssl, nikto, sqlmap, dirsearch), dir paths point to the cloned directory
+tool_paths:
+  subfinder: "/home/ashfiexe/go/bin/subfinder" 
+  httpx: "/home/ashfiexe/go/bin/httpx"         
+  katana: "/home/ashfiexe/go/bin/katana"       
+  nmap: "nmap"                                # Assumes nmap is in system PATH
+  whatweb: "whatweb"                          # Assumes whatweb is in system PATH
+  nuclei: "/home/ashfiexe/go/bin/nuclei"       
+  dalfox: "/home/ashfiexe/go/bin/dalfox"       
+  searchsploit: "searchsploit"                # Assumes searchsploit is in system PATH
+  
+  testssl_dir: "/opt/testssl.sh"              # Directory where testssl.sh is cloned
+  testssl_script_name: "testssl.sh"           # Script name within testssl_dir
+
+  nikto_dir: "/opt/nikto"                     # Directory where nikto is cloned
+  nikto_script_name: "program/nikto.pl"       # Script path relative to nikto_dir
+
+  sqlmap_dir: "/opt/sqlmap"                   # Directory where sqlmap is cloned
+  sqlmap_script_name: "sqlmap.py"             # Script name within sqlmap_dir
+
+  dirsearch_dir: "/opt/dirsearch"             # Directory where dirsearch is cloned
+  dirsearch_script_name: "dirsearch.py"       # Script name within dirsearch_dir
+
+# --- Wordlists ---
+default_wordlist: "~/.cybersage_v2/wordlists/common.txt" 
+dirsearch_wordlist: "~/.cybersage_v2/wordlists/common.txt" 
+
+# --- Nuclei Specifics ---
+nuclei_update_templates: true 
+nuclei_templates_path: "~/nuclei-templates" # Default Nuclei templates path
+
+# --- AI (OpenRouter) Specifics ---
+openai_api_key: "sk-or-v1-YOUR_OPENROUTER_API_KEY_HERE_OR_LEAVE_BLANK" # Replace or leave blank
+openrouter_api_base: "https://openrouter.ai/api/v1"
+openrouter_model_preference: "mistralai/mistral-7b-instruct" # A good, relatively cheap model
+openrouter_http_referrer: "http://localhost:5000" # Optional, good practice for OpenRouter
+openrouter_app_title: "CyberSageV2"               # Optional
+
+# --- Tool Specific Options ---
+nmap_timing_template: "-T4" 
+nmap_default_scripts: true 
+nmap_port_scan_options: "--top-ports 1000 -sT -n --min-rate 1000 --max-retries 1" # -sT (TCP Connect), -n (no DNS)
+
+katana_crawl_depth: 1 
+katana_concurrency: 5 # Katana uses -c for concurrency
+dalfox_timeout: 120   # Seconds for individual Dalfox requests
+dalfox_workers: 10    # Dalfox v2 uses -w <number> for workers. Verify with `dalfox --help`.
+testssl_timeout: 180  # Seconds for testssl.sh to complete on a target
+dirsearch_threads: 15
+dirsearch_max_time: 120 # Seconds total for dirsearch on one target
+dirsearch_extensions: "php,html,htm,js,txt,json,xml,bak,config,md,sql,env,yml,yaml"
+dirsearch_exclude_status: "400,403,404,500-599,429"
+sqlmap_level: 1 
+sqlmap_risk: 1  
+sqlmap_options: "--batch --random-agent --threads=3 --smart --forms --crawl=0" 
+nikto_options: "-Tuning x 0123bde -maxtime 120s -nointeractive"

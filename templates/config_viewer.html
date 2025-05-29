@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberSage - Configuration</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+        pre { white-space: pre-wrap; word-wrap: break-word; }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-200 p-4 sm:p-8">
+    <header class="mb-6 max-w-4xl mx-auto">
+        <div class="flex justify-between items-center">
+            <h1 class="text-2xl sm:text-3xl font-bold text-indigo-400">CyberSage Configuration</h1>
+            <a href="{{ url_for('index') }}" class="text-sm bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-3 rounded-md transition">New Scan</a>
+        </div>
+        <p class="text-gray-400 mt-2">Current settings from <code>config/tools.yaml</code>. Edit the file and restart the application for changes to take effect.</p>
+    </header>
+    <main class="bg-gray-800 p-4 sm:p-6 rounded-lg shadow-lg max-w-4xl mx-auto">
+        <pre class="text-xs sm:text-sm">{{ config_data }}</pre>
+    </main>
+     <footer class="mt-8 text-center text-gray-500 text-sm">
+        <p>© <span id="currentYearConfig"></span> CyberSage - For educational and authorized testing only.</p>
+    </footer>
+    <script>document.getElementById('currentYearConfig').textContent = new Date().getFullYear();</script>
+</body>
+</html>

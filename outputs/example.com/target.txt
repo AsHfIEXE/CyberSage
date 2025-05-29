@@ -1,0 +1,1 @@
+http://example.com/page.php?id=1 (GET)  # /usr/bin/sqlmap -u http://example.com/page.php?id=1 --batch --output-dir=outputs
