@@ -28,7 +28,7 @@ HTTP_REFERRER = TOOL_CONFIG.get('openrouter_http_referrer', 'http://localhost:50
 APP_TITLE = TOOL_CONFIG.get('openrouter_app_title', 'CyberSageV2')
 
 
-def get_openrouter_client():
+def get_openrouter_client():    
     if OPENROUTER_API_KEY and OPENROUTER_API_KEY != "sk-or-v1-YOUR_OPENROUTER_API_KEY_HERE": # Check it's not the placeholder
         try:
             client = OpenAI(
