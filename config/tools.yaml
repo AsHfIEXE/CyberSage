@@ -6,7 +6,7 @@ recon_tools:
 crawl_tools:
   endpoint_discovery: ["katana"]
 scan_tools:
-  service_and_version_scanning: ["nmap"] # Nmap for ports and services
+  service_and_version_scanning: ["nmap"]
   ssl_testing: ["testssl"]
   web_server_vuln_scanning: ["nikto"]
 service_id_tools:
@@ -18,59 +18,56 @@ vuln_scan_tools:
 exploit_tools:
   cve_exploitation: ["searchsploit"]
 
-# --- Tool Paths (CRITICAL: VERIFY THESE ARE CORRECT FOR YOUR SYSTEM) ---
-# For Go tools (subfinder, httpx, katana, nuclei, dalfox), use absolute paths
-# e.g., /home/ashfiexe/go/bin/toolname
-# For cloned tools (testssl, nikto, sqlmap, dirsearch), dir paths point to the cloned directory
+# --- Tool Paths (CRITICAL: UPDATED BASED ON YOUR 'which' OUTPUT) ---
 tool_paths:
-  subfinder: "/home/ashfiexe/go/bin/subfinder" 
-  httpx: "/home/ashfiexe/go/bin/httpx"         
-  katana: "/home/ashfiexe/go/bin/katana"       
-  nmap: "nmap"                                # Assumes nmap is in system PATH
-  whatweb: "whatweb"                          # Assumes whatweb is in system PATH
-  nuclei: "/home/ashfiexe/go/bin/nuclei"       
-  dalfox: "/home/ashfiexe/go/bin/dalfox"       
-  searchsploit: "searchsploit"                # Assumes searchsploit is in system PATH
+  subfinder: "/usr/bin/subfinder" # Using system path found by 'which'
+  httpx: "/home/kali/go/bin/httpx " # CRITICAL: Forcing ProjectDiscovery's Go version
+  katana: "/home/kali/go/bin/katana"        
+  nmap: "/usr/bin/nmap" # Or just "nmap" if /usr/bin is in PATH
+  whatweb: "/usr/bin/whatweb" # Or just "whatweb"
+  nuclei: "/home/user/go/bin/nuclei"       
+  dalfox: "/home/kali/go/bin/dalfox"       
+  searchsploit: "/usr/bin/searchsploit" # Or just "searchsploit"
   
-  testssl_dir: "/opt/testssl.sh"              # Directory where testssl.sh is cloned
-  testssl_script_name: "testssl.sh"           # Script name within testssl_dir
+  testssl_dir: "/opt/testssl.sh"              
+  testssl_script_name: "testssl.sh"           
 
-  nikto_dir: "/opt/nikto"                     # Directory where nikto is cloned
-  nikto_script_name: "program/nikto.pl"       # Script path relative to nikto_dir
+  nikto_dir: "/opt/nikto" # If /usr/bin/nikto is a wrapper, this might still be needed for plugins
+  nikto_script_name: "program/nikto.pl" # Or you can try tool_paths.nikto: "/usr/bin/nikto" if that works
 
-  sqlmap_dir: "/opt/sqlmap"                   # Directory where sqlmap is cloned
-  sqlmap_script_name: "sqlmap.py"             # Script name within sqlmap_dir
+  sqlmap_dir: "/opt/sqlmap" # If /usr/bin/sqlmap is a wrapper, this might be needed for full functionality
+  sqlmap_script_name: "sqlmap.py" # Or try tool_paths.sqlmap: "/usr/bin/sqlmap"
 
-  dirsearch_dir: "/opt/dirsearch"             # Directory where dirsearch is cloned
-  dirsearch_script_name: "dirsearch.py"       # Script name within dirsearch_dir
-
+  #dirsearch_dir: "/opt/dirsearch"             
+  #dirsearch_script_name: "dirsearch.py"       
+dirsearch: "/home/kali/.local/bin/dirsearch" 
 # --- Wordlists ---
 default_wordlist: "~/.cybersage_v2/wordlists/common.txt" 
 dirsearch_wordlist: "~/.cybersage_v2/wordlists/common.txt" 
 
 # --- Nuclei Specifics ---
 nuclei_update_templates: true 
-nuclei_templates_path: "~/nuclei-templates" # Default Nuclei templates path
+nuclei_templates_path: "~/.config/nuclei/templates" # More standard path for user-managed templates
 
 # --- AI (OpenRouter) Specifics ---
-openai_api_key: "sk-or-v1-YOUR_OPENROUTER_API_KEY_HERE_OR_LEAVE_BLANK" # Replace or leave blank
+openai_api_key: "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" 
 openrouter_api_base: "https://openrouter.ai/api/v1"
-openrouter_model_preference: "mistralai/mistral-7b-instruct" # A good, relatively cheap model
-openrouter_http_referrer: "http://localhost:5000" # Optional, good practice for OpenRouter
-openrouter_app_title: "CyberSageV2"               # Optional
+openrouter_model_preference: "mistralai/mistral-7b-instruct" 
+openrouter_http_referrer: "http://localhost:5000" 
+openrouter_app_title: "CyberSage" 
 
 # --- Tool Specific Options ---
 nmap_timing_template: "-T4" 
 nmap_default_scripts: true 
-nmap_port_scan_options: "--top-ports 1000 -sT -n --min-rate 1000 --max-retries 1" # -sT (TCP Connect), -n (no DNS)
+nmap_port_scan_options: "--top-ports 1000 -sT -n --min-rate 1000 --max-retries 1" 
 
 katana_crawl_depth: 1 
-katana_concurrency: 5 # Katana uses -c for concurrency
-dalfox_timeout: 120   # Seconds for individual Dalfox requests
-dalfox_workers: 10    # Dalfox v2 uses -w <number> for workers. Verify with `dalfox --help`.
-testssl_timeout: 180  # Seconds for testssl.sh to complete on a target
+katana_concurrency: 10 # Katana uses -c flag
+dalfox_timeout: 120   
+dalfox_workers: 10    # Dalfox v2 uses -w <number> flag. Verify with `dalfox --help`.
+testssl_timeout: 180
 dirsearch_threads: 15
-dirsearch_max_time: 120 # Seconds total for dirsearch on one target
+dirsearch_max_time: 120 
 dirsearch_extensions: "php,html,htm,js,txt,json,xml,bak,config,md,sql,env,yml,yaml"
 dirsearch_exclude_status: "400,403,404,500-599,429"
 sqlmap_level: 1 
