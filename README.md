@@ -205,7 +205,6 @@ Contributions, issues, and feature requests are welcome! Feel free to check [iss
 ## 📜 License
 
 Distributed under the MIT License. See `LICENSE.txt` for more information.
-*(Create a LICENSE.txt file with the MIT License text if you choose this license).*
 
 ## ⚠️ Disclaimer
 
