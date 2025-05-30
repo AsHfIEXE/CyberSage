@@ -170,6 +170,11 @@ Follow these steps to get CyberSage  up and running on your system (Debian/Ubunt
 
 *(placeholder for a GIF showing the scan process and results view)*
 `[GIF of CyberSage in action]`
+![Screenshot From 2025-05-30 11-31-31](https://github.com/user-attachments/assets/8f901f95-52eb-4d35-8da3-7ba1065b5779)
+![Screenshot From 2025-05-30 12-37-37](https://github.com/user-attachments/assets/ad7a283f-06be-4794-87dd-33d86ef6c44e)
+
+![Screenshot From 2025-05-30 13-04-44](https://github.com/user-attachments/assets/020aebbe-b859-4062-993a-615f12e0ae9c)
+![Screenshot From 2025-05-30 13-04-57](https://github.com/user-attachments/assets/d6366a7d-1e10-4060-8c02-9a695d1b78a4)
 
 ## 🔧 Troubleshooting
 
