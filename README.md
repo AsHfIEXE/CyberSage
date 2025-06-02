@@ -218,5 +218,5 @@ CyberSage  is a powerful tool intended for **educational purposes and authorized
 ---
 
 <p align="center">
-  Made with ❤️ by Salehin Ashfi
+  Made by ❤️ by Salehin Ashfi
 </p>
