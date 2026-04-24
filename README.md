@@ -27,7 +27,7 @@
 
 ---
 
-**CyberSage ** is a powerful, Flask-based web application meticulously engineered to automate and streamline the complex workflow of web security assessments and penetration testing. By orchestrating a suite of battle-tested open-source security tools, CyberSage V2 empowers security professionals, developers, and enthusiasts to efficiently uncover vulnerabilities, understand attack surfaces, and bolster web application defenses.
+**CyberSage** is a powerful, Flask-based web application meticulously engineered to automate and streamline the complex workflow of web security assessments and penetration testing. By orchestrating a suite of battle-tested open-source security tools, CyberSage V2 empowers security professionals, developers, and enthusiasts to efficiently uncover vulnerabilities, understand attack surfaces, and bolster web application defenses.
 
 The platform offers a modern, intuitive web interface for initiating comprehensive scans, tracking their progress in real-time, and analyzing consolidated findings presented in an accessible and actionable format.
 
